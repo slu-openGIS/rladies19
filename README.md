@@ -61,7 +61,7 @@ install.packages(c("tidyverse", "here", "knitr", "remotes", "rmarkdown", "stlcsb
 There are two other packages we'll need which are not yet published on CRAN. These can be installed with the `remotes` package once you've run the code chunk above:
 
 ```r
-remotes::install_github(c("slu-openGIS/compstatr", "slu-openGIS/gateway"))
+remotes::install_github(c("slu-openGIS/compstatr", "slu-openGIS/gateway", "slu-openGIS/postmastr"))
 ```
 
 #### Download Lesson Materials

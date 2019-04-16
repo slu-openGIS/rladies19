@@ -17,9 +17,11 @@ Imports:
     gapminder,
     gateway,
     knitr,
+    postmastr,
     rmarkdown,
     stlcsb,
     usethis
 Remotes:
     slu-openGIS/compstatr,
-    slu-openGIS/gateway
+    slu-openGIS/gateway,
+    slu-openGIS/postmastr
