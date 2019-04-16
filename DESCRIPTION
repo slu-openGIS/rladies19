@@ -1,0 +1,25 @@
+Package: rladies19
+Title: Mapping Health and Social Data from St. Louis, MO with tidystl
+Version: 0.1.0
+Authors@R: person("Christopher", "Prener", email = "chris.prener@slu.edu",
+     role = c("aut", "cre")
+Description: This repository contains lesson materials from Chris's RLadies
+     session in April 2019, which covers some basic elements of working
+     with spatial data using tidystl.
+Depends: R (>= 3.3)
+License: CC-BY-SA-4.0 + LICENSE
+Web: https://slu-openGIS.github.io
+URL: https://github.com/slu-openGIS/rladies19
+BugReports: https://github.com/slu-openGIS/rladies19/issues
+Imports:
+    compstatr,
+    dplyr,
+    gapminder,
+    gateway,
+    knitr,
+    rmarkdown,
+    stlcsb,
+    usethis
+Remotes:
+    slu-openGIS/compstatr,
+    slu-openGIS/gateway
