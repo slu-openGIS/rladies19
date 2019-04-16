@@ -7,10 +7,14 @@ The following packages are required for this lesson. Base `R` packages are not i
 2. Ensure that RStudio is up to date - you can download it [here](https://www.rstudio.com/products/rstudio/download/#download)
 
 ## Packages
-The `README` provides simplified syntax for installing all of these packages.
-
 ### Spatial Packages
-I recommend installing `sf` before any addition packages are installed. To test whether the installation has gone smoothly, you can execute the following two lines of code in your `R` console:
+I recommend installing `sf` before any addition packages are installed:
+
+```r
+install.packages("sf")
+```
+
+To test whether the installation has gone smoothly, you can execute the following two lines of code in your `R` console:
 
 ```r
 library(sf)
@@ -34,26 +38,41 @@ proj4string:    +proj=longlat +datum=NAD27 +no_defs
 
 If you get installation errors related to missing dependencies, you may need to install the latest verion of [RTools](https://cran.r-project.org/bin/windows/Rtools/) (currently RTools 35) if you are a Windows user. macOS users may need to install the GDAL complete framework from the [kyngchaos](http://www.kyngchaos.com/software/frameworks/) website (currently GDLAD 2.4 Complete).
 
-### `tidyverse` Packages
+### General R Packages
+Once you have `sf` installed, the remaining general packages can be installed with the following syntax:
+
+```r
+install.packages(c("tidyverse", "here", "knitr", "remotes", "rmarkdown", "stlcsb", "usethis"))
+```
+
+These packages are described below.
+
+#### `tidyverse` Packages
 *These are most easily installed by installing the entire tidyverse.*
 
 * `dplyr` - tools for data wrangling
 * `ggplot2` - tools for plotting
 
-### `tidystl` Packages
-*Not all of these packages are available through CRAN at this time.*
-
-* `compstatr` - must be installed using `remotes`
-* `gateway` - must be installed using `remotes`
-* `postmastr` - must be installed using `remotes`
-* `stlcsb` - available through CRAN
-
-### Literate Programming
+#### Literate Programming
 *These will not be referred to directly during the session but are needed for the notebook to work correctly.*
 
 * `knitr` - create documents from R notebooks
 * `rmarkdown` - write in Markdown syntax
 
-### Other packages
+#### Other packages
 
 * `here` - file path management
+
+### `tidystl` Packages
+*Not all of these packages are available through CRAN at this time.*
+
+* `compstatr` - must be installed via GitHub using `remotes`
+* `gateway` - must be installed via GitHub using `remotes`
+* `postmastr` - must be installed via GitHub using `remotes`
+* `stlcsb` - available through CRAN (and included in the above install code chunk)
+
+The three packages that must be installed via GitHub can be installed using the following syntax:
+
+```r
+remotes::install_github(c("slu-openGIS/compstatr", "slu-openGIS/gateway", "slu-openGIS/postmastr"))
+```

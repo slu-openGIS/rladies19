@@ -21,7 +21,7 @@ By the end of this lesson, learners should be able to:
 
 ### Lesson Quick Start
 #### Install Key Dependencies
-Before you proceed with other installations, it is important to get the `sf` package installed correctly. Users should be able to install `sf` using:
+Before you proceed with other installations, it is important to get the `sf` package installed correctly. You should be able to install `sf` using:
 
 ```r
 install.packages("sf")
