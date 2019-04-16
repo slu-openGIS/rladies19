@@ -20,8 +20,39 @@ By the end of this lesson, learners should be able to:
 
 
 ### Lesson Quick Start
+#### Install Key Dependencies
+Before you proceed with other installations, it is important to get the `sf` package installed correctly. Users should be able to install `sf` using:
+
+```r
+install.packages("sf")
+```
+
+To test whether the installation has gone smoothly, you can execute the following two lines of code in your `R` console:
+
+```r
+library(sf)
+nc <- st_read(system.file("shape/nc.shp", package="sf"))
+```
+
+The output should look like so:
+
+```r
+> library(sf)
+Linking to GEOS 3.6.1, GDAL 2.1.3, PROJ 4.9.3
+> nc <- st_read(system.file("shape/nc.shp", package="sf"))
+Reading layer `nc' from data source `/Users/prenercg/Library/R/3.5/library/sf/shape/nc.shp' using driver `ESRI Shapefile'
+Simple feature collection with 100 features and 14 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
+epsg (SRID):    4267
+proj4string:    +proj=longlat +datum=NAD27 +no_defs
+```
+
+If you get installation errors related to missing dependencies, you may need to install the latest verion of [RTools](https://cran.r-project.org/bin/windows/Rtools/) (currently RTools 35) if you are a Windows user. macOS users may need to install the GDAL complete framework from the [kyngchaos](http://www.kyngchaos.com/software/frameworks/) website (currently GDLAD 2.4 Complete). Feel free to reach out to [Chris](mailto:chris.prener@slu.edu) with questions about this.
+
 #### Install Necessary Packages
-The packages we'll need for today can be installed using:
+Once you have `sf` up and running, the packages we'll need for today can be installed using:
 
 ```r
 install.packages(c("tidyverse", "here", "knitr", "remotes", "rmarkdown", "stlcsb", "usethis"))
