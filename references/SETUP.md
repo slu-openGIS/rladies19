@@ -1,4 +1,4 @@
-# wrangling-03 Setup
+# rladies19 Setup
 The following packages are required for this lesson. Base `R` packages are not included here since they are pre-installed.
 
 ## First Steps
