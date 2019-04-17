@@ -29,6 +29,16 @@ knitr::include_graphics(path = "assets/prenerLogo.png")
 
 ---
 
+# St. Louis Offers A Lot to Researchers
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/forclose.png")
+```
+
+---
+
+# But...
+
 ```{r, echo=FALSE, fig.align="center", out.width = "100%"}
 knitr::include_graphics(path = "assets/kondo.png")
 ```
