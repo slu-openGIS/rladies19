@@ -1,0 +1,144 @@
+---
+title: "tidystl"
+subtitle: "Mapping St. Louis health and social data with R"
+author: "Chris Prener"
+date: "April 17th, 2019"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "rladies", "rladies-fonts"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+# "Hi, I'm Chris"
+
+.pull-left[ 
+* Assistant Professor of Sociology at Saint Louis University
+* I teach statistics, GIS, and classes on urban and health issues
+* I'm interested in how neighborhoods shape our lives, and how we in turn shape neighborhoods...
+* ...which means I spend a lot of time using bulk administrative data released by cities.
+]
+
+
+```{r, echo=FALSE, fig.align="right", out.width = "40%"}
+knitr::include_graphics(path = "assets/prenerLogo.png")
+```
+
+---
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/kondo.png")
+```
+
+---
+
+# Barriers to Joyful Data
+
+* There is no single API access point for data from the City
+* Closed formats (`.pdf`, Access Databases) are the norm
+* Untidy data abounds
+
+---
+
+# Untidy Data Abounds
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/stlmpd_01.png")
+```
+
+---
+
+# Untidy Data Abounds
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/stlmpd_02.png")
+```
+
+---
+
+# Untidy Data Abounds
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/stlmpd_03.png")
+```
+
+---
+
+# Untidy Data Abounds
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/stlmpd_04.png")
+```
+
+---
+
+# Barriers to Joyful Data
+
+* There is no single API access point for data from the City
+* Closed formats (`.pdf`, Access Databases) are the norm
+* Untidy data abounds
+* Answering questions with the City's data also requires specialized GIS skills
+
+---
+
+# Barriers to Joyful Data
+
+* There is no single API access point for data from the City
+* Closed formats (`.pdf`, Access Databases) are the norm
+* Untidy data abounds
+* Answering questions with the City's data also requires specialized GIS skills
+* Geocoding is expensive
+    * for example, geocoding the 1.4 million Citizens' Service Bureau incidents would cost ~$5,600
+
+---
+
+# The `tidystl` Ecosystem
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/tidystl_01.png")
+```
+
+---
+
+# The `tidystl` Ecosystem
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/tidystl_02.png")
+```
+
+---
+
+# The `tidystl` Ecosystem
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/tidystl_03.png")
+```
+
+---
+
+# The `tidystl` Ecosystem
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/tidystl_04.png")
+```
+
+---
+
+# The `tidystl` Ecosystem
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/tidystl_05.png")
+```
+
+---
+
+# Open Source, Composite Geocoding
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/compositeGeocoder.png")
+```
+
+

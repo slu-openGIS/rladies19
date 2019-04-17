@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>tidystl</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Chris Prener" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/rladies.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/rladies-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# tidystl
+## Mapping St. Louis health and social data with R
+### Chris Prener
+### April 17th, 2019
+
+---
+
+
+# "Hi, I'm Chris"
+
+.pull-left[ 
+* Assistant Professor of Sociology at Saint Louis University
+* I teach statistics, GIS, and classes on urban and health issues
+* I'm interested in how neighborhoods shape our lives, and how we in turn shape neighborhoods...
+* ...which means I spend a lot of time using bulk administrative data released by cities.
+]
+
+
+&lt;img src="assets/prenerLogo.png" width="40%" style="display: block; margin: auto 0 auto auto;" /&gt;
+
+---
+
+&lt;img src="assets/kondo.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Barriers to Joyful Data
+
+* There is no single API access point for data from the City
+* Closed formats (`.pdf`, Access Databases) are the norm
+* Untidy data abounds
+
+---
+
+# Untidy Data Abounds
+
+&lt;img src="assets/stlmpd_01.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Untidy Data Abounds
+
+&lt;img src="assets/stlmpd_02.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Untidy Data Abounds
+
+&lt;img src="assets/stlmpd_03.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Untidy Data Abounds
+
+&lt;img src="assets/stlmpd_04.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Barriers to Joyful Data
+
+* There is no single API access point for data from the City
+* Closed formats (`.pdf`, Access Databases) are the norm
+* Untidy data abounds
+* Answering questions with the City's data also requires specialized GIS skills
+
+---
+
+# Barriers to Joyful Data
+
+* There is no single API access point for data from the City
+* Closed formats (`.pdf`, Access Databases) are the norm
+* Untidy data abounds
+* Answering questions with the City's data also requires specialized GIS skills
+* Geocoding is expensive
+    * for example, geocoding the 1.4 million Citizens' Service Bureau incidents would cost ~$5,600
+
+---
+
+# The `tidystl` Ecosystem
+
+&lt;img src="assets/tidystl_01.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# The `tidystl` Ecosystem
+
+&lt;img src="assets/tidystl_02.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# The `tidystl` Ecosystem
+
+&lt;img src="assets/tidystl_03.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# The `tidystl` Ecosystem
+
+&lt;img src="assets/tidystl_04.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# The `tidystl` Ecosystem
+
+&lt;img src="assets/tidystl_05.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Open Source, Composite Geocoding
+
+&lt;img src="assets/compositeGeocoder.png" width="100%" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
