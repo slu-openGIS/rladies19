@@ -1,0 +1,7 @@
+$ cat .gitattributes
+*.Rmd linguist-language=R
+*.html linguist-detectable=FALSE
+docs/*.Rmd linguist-language=R
+docs/*.html linguist-detectable=FALSE
+notebook/*.Rmd linguist-language=R
+notebook/*.html linguist-detectable=FALSE
