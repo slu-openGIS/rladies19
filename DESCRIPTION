@@ -20,8 +20,10 @@ Imports:
     here,
     knitr,
     postmastr,
+    readr,
     rmarkdown,
     stlcsb,
+    testthat,
     usethis
 Remotes:
     slu-openGIS/compstatr,

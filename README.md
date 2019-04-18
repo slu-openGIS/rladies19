@@ -33,7 +33,7 @@ If you run into issues, check the [setup instructions for suggestions](reference
 Once you have `sf` up and running, the packages we'll need for today can be installed using:
 
 ```r
-install.packages(c("tidyverse", "here", "knitr", "remotes", "rmarkdown", "stlcsb", "usethis"))
+install.packages(c("tidyverse", "here", "knitr", "remotes", "rmarkdown", "stlcsb", "testthat", "usethis"))
 ```
 
 There are several other packages we'll need which are not yet published on CRAN. These can be installed with the `remotes` package once you've run the code chunk above:

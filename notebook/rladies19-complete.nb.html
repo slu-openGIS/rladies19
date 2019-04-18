@@ -1820,7 +1820,10 @@ library(here)          # file path management</code></pre>
 </div>
 <div id="load-data" class="section level2">
 <h2>Load Data</h2>
-<p>This notebook requires a number of data sets, some of which we can load right away. Two local geocoders are saved as <code>.rda</code> files in the <code>data/</code> to provide the most efficient storage means possible:</p>
+<p>This notebook requires a number of data sets, which we’ll load in groups based on their purpose.</p>
+<div id="geocoders" class="section level3">
+<h3>Geocoders</h3>
+<p>Two local geocoders are saved as <code>.rda</code> files in the <code>data/</code> to provide the most efficient storage means possible:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9hZChoZXJlKFwiZGF0YVwiLCBcImdlb2NvZGVyLnJkYVwiKSlcbmBgYCJ9 -->
@@ -1835,10 +1838,103 @@ geocoder &lt;- gw_build_geocoder(style = &quot;full&quot;, class = &quot;tibble&
 # build local short goecoder
 geocoder_s &lt;- gw_build_geocoder(style = &quot;short&quot;, class = &quot;tibble&quot;, return = &quot;coords&quot;)</code></pre>
 <p>These are not built here to save time during the tutorial.</p>
+</div>
+<div id="citizens-service-bureau-data" class="section level3">
+<h3>Citizens’ Service Bureau Data</h3>
+<p>A data set of non-emergency service requests (things like concerns about potholes, traffic lights that are out, and vacant buildings) for the years 2017 and 2018 is included in this repository:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3NiIDwtIHJlYWRfY3N2KGhlcmUoXCJkYXRhXCIsIFwiY3NiLmNzdlwiKSlcbmBgYCJ9 -->
+<pre class="r"><code>csb &lt;- read_csv(here(&quot;data&quot;, &quot;csb.csv&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>These data can also be downloaded directly via the <code>stlcsb</code> package’s <code>csb_get_data()</code> function:</p>
+<pre class="r"><code>csb &lt;- csb_get_data(years = 2017:2018)</code></pre>
+<p>The <code>years</code> argument is optional.</p>
+</div>
+<div id="crime-data" class="section level3">
+<h3>Crime Data</h3>
+<p>The crime data we’ll be looking at today, also for 2017 and 2018, is included in its raw form in <code>data/crime/</code>. These data have been downloaded from the St. Louis Metropolitan Police Department’s <a href="https://www.slmpd.org/Crimereports.shtml">crime statistics website</a>. Because of the structure of the site, we don’t have a function at this time the reads the files into <code>R</code> direction from the web. They must be downloaded manually and then can be read in using the workflow below.</p>
+<p>The <code>compstatr</code> package is “opinionated” and requires a particular organizational approach - monthly crime files should be stored as a package in dedicated yearly folders. Notice that the files have the <code>.html</code> file extension mistakenly appended:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlzdC5maWxlcyhwYXRoID0gaGVyZShcImRhdGFcIiwgXCJjcmltZVwiLCBcIjIwMTdcIikpXG5gYGAifQ== -->
+<pre class="r"><code>list.files(path = here(&quot;data&quot;, &quot;crime&quot;, &quot;2017&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcIkFwcmlsMjAxNy5DU1YuaHRtbFwiICAgICBcIkF1Z3VzdDIwMTcuQ1NWLmh0bWxcIiAgICBcIkRlY2VtYmVyMjAxNy5DU1YuaHRtbFwiICBcIkZlYnJ1YXJ5MjAxNy5DU1YuaHRtbFwiICBcIkphbnVhcnkyMDE3LkNTVi5odG1sXCIgICBcIkp1bHkyMDE3LkNTVi5odG1sXCIgICAgICBcIkp1bmUyMDE3LkNTVi5odG1sXCIgICAgIFxuIFs4XSBcIk1hcmNoMjAxNy5DU1YuaHRtbFwiICAgICBcIk1heTIwMTcuQ1NWLmh0bWxcIiAgICAgICBcIk5vdmVtYmVyMjAxNy5DU1YuaHRtbFwiICBcIk9jdG9iZXIyMDE3LkNTVi5odG1sXCIgICBcIlNlcHRlbWJlcjIwMTcuQ1NWLmh0bWxcIlxuIn0= -->
+<pre><code> [1] &quot;April2017.CSV.html&quot;     &quot;August2017.CSV.html&quot;    &quot;December2017.CSV.html&quot;  &quot;February2017.CSV.html&quot;  &quot;January2017.CSV.html&quot;   &quot;July2017.CSV.html&quot;      &quot;June2017.CSV.html&quot;     
+ [8] &quot;March2017.CSV.html&quot;     &quot;May2017.CSV.html&quot;       &quot;November2017.CSV.html&quot;  &quot;October2017.CSV.html&quot;   &quot;September2017.CSV.html&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We can fix this with <code>cs_prep_year()</code>. The <code>verbose</code> option returns a tibble that illustrates how file names have been modified. Once modified, they can be loaded with <code>cs_load_year()</code>:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBwcmVwIGZpbGVzXG5jc19wcmVwX3llYXIocGF0aCA9IGhlcmUoXCJkYXRhXCIsIFwiY3JpbWVcIiwgXCIyMDE3XCIpLCB2ZXJib3NlID0gVFJVRSlcblxuIyBsb2FkIGRhdGFcbmRhdGEyMDE3X3JhdyA8LSBjc19sb2FkX3llYXIoaGVyZShcImRhdGFcIiwgXCJjcmltZVwiLCBcIjIwMTdcIikpXG5gYGAifQ== -->
+<pre class="r"><code># prep files
+cs_prep_year(path = here(&quot;data&quot;, &quot;crime&quot;, &quot;2017&quot;), verbose = TRUE)
+
+# load data
+data2017_raw &lt;- cs_load_year(here(&quot;data&quot;, &quot;crime&quot;, &quot;2017&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The <code>data2017_raw</code> is a list of tibbles, with one tibble per month for each month in a given folder. This allows for a streamlined workflow for validating and standardizing the data.</p>
+<p>Now you try and fix the files in the <code>data/crime/2018</code> folder and then load them:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBwcmVwIGZpbGVzXG5jc19wcmVwX3llYXIocGF0aCA9IGhlcmUoXCJkYXRhXCIsIFwiY3JpbWVcIiwgXCIyMDE4XCIpLCB2ZXJib3NlID0gVFJVRSlcbmBgYCJ9 -->
+<pre class="r"><code># prep files
+cs_prep_year(path = here(&quot;data&quot;, &quot;crime&quot;, &quot;2018&quot;), verbose = TRUE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibmNvbCI6MiwibnJvdyI6MTJ9LCJyZGYiOiJINHNJQUFBQUFBQUFBM1dUVDIrQ01CakdhNUZ0TW5INGI5OUNzbm5hMWN6c1lPS1d6R1R4V3JFcUJscFNxbTYzZmVpZFpRVmJLUVJJS09WNWVONzIvYVY4VHBkamEya0JBQ0F3VEFpZ0lhWk5LSVlHYUlKVyt2d0d3T2huSHdEZ2lMc3RqZDRrWW40d2ZucCtjVjhYWCs2T2g0RjArcFBEOWhEekttczR4UjRPVjVoVm1tOTR4UTZJL1ZTWmd4a2lkVjUzZGdqcURJS3JqTjRjTVc5WDVUaHpWRmxxK0U2UHRUc2ZmSGljMW5pUEN4enhpbVNScG8ydU5MMzRLTVVPeWtIbXFyUFdHV3I2UnNlWDZ3OTdqVnd1dC9jS1drR1R2SExORHErb2N2RStST1dzUTNSQTJ2SlVZNVBMM2JpQUpUV0tCODhrS01TeHhBU2xlRWVadi9VSlVuQU5naytsWEl2Ums2dXlkcHI5RlVPU0pIL2xCYndBeFdvQkpWcHJ4Skc3WVNJdjNzNmx5QzJOdUUrSkNNSDBsekJMNFFZckNaMkk0V2dVVUxRZXBWMm05VFAzY3RseTN0Ym04TElpVEdRbFUxYTZ3VVQwamRYV0E3VENpa0ZITkp6MTY0b2pSTGhxUktpeHl5bS9zckk4R2lnbGF3MmMvd0Y2MndvVy93TUFBQT09In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["original"],"name":[1],"type":["chr"],"align":["left"]},{"label":["new"],"name":[2],"type":["chr"],"align":["left"]}],"data":[{"1":"April2018.CSV.html","2":"april2018.csv"},{"1":"August2018.CSV.html","2":"august2018.csv"},{"1":"December2018.CSV.html","2":"december2018.csv"},{"1":"February2018.CSV.html","2":"february2018.csv"},{"1":"January2018.CSV.html","2":"january2018.csv"},{"1":"July2018.CSV.html","2":"july2018.csv"},{"1":"June2018.CSV.html","2":"june2018.csv"},{"1":"March2018.CSV.html","2":"march2018.csv"},{"1":"May2018.CSV.html","2":"may2018.csv"},{"1":"November2018.CSV.html","2":"november2018.csv"},{"1":"October2018.CSV.html","2":"october2018.csv"},{"1":"September2018.CSV.html","2":"september2018.csv"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[12]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsb2FkIGRhdGFcbmRhdGEyMDE4X3JhdyA8LSBjc19sb2FkX3llYXIoaGVyZShcImRhdGFcIiwgXCJjcmltZVwiLCBcIjIwMThcIikpXG5gYGAifQ== -->
+<pre class="r"><code># load data
+data2018_raw &lt;- cs_load_year(here(&quot;data&quot;, &quot;crime&quot;, &quot;2018&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="validate-standardize-and-collapse-crime-data" class="section level2">
+<h2>Validate, Standardize, and Collapse Crime Data</h2>
+<p>The data from SLMPD have un-even numbers of columns, column names, and column types depending on the year</p>
+<div id="section" class="section level3">
+<h3>2018</h3>
+<p>We validate the data to make sure it can be collapsed using <code>cs_validate()</code>:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3NfdmFsaWRhdGUoZGF0YTIwMThfcmF3LCB5ZWFyID0gXCIyMDE4XCIpXG5gYGAifQ== -->
+<pre class="r"><code>cs_validate(data2018_raw, year = &quot;2018&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Since the validation result is a value of <code>TRUE</code>, we can proceed to collapsing the year-list object into a single tibble with <code>cs_collapse()</code> and then stripping out crimes reported in 2018 for earlier years using <code>cs_combine()</code>. We also strip out unfounded crimes that remain using <code>cs_filter_count()</code>:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjb2xsYXBzZSBpbnRvIHNpbmdsZSBvYmplY3RcbmRhdGEyMDE4X3JhdyA8LSBjc19jb2xsYXBzZShkYXRhMjAxOF9yYXcpXG5cbiMgY29tYmluZSBhbmQgZmlsdGVyXG5jc19jb21iaW5lKHR5cGUgPSBcInllYXJcIiwgZGF0ZSA9IDIwMTgsIGRhdGEyMDE4X3JhdykgJT4lXG4gIGNzX2ZpbHRlcl9jb3VudCh2YXIgPSBDb3VudCkgLT4gZGF0YTIwMThcbmBgYCJ9 -->
+<pre class="r"><code># collapse into single object
+data2018_raw &lt;- cs_collapse(data2018_raw)
+
+# combine and filter
+cs_combine(type = &quot;year&quot;, date = 2018, data2018_raw) %&gt;%
+  cs_filter_count(var = Count) -&gt; data2018</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The <code>data2018</code> object now contains only crimes reported in 2018.</p>
 <!-- rnb-text-end -->
 </div>
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUkxhZGllcyAyMDE5IgphdXRob3I6ICJDaHJpc3RvcGhlciBQcmVuZXIsIFBoLkQuIgpkYXRlOiAnKGByIGZvcm1hdChTeXMudGltZSgpLCAiJUIgJWQsICVZIilgKScKb3V0cHV0OiAKICBnaXRodWJfZG9jdW1lbnQ6IGRlZmF1bHQKICBodG1sX25vdGVib29rOiBkZWZhdWx0IAotLS0KCiMjIEludHJvZHVjdGlvbgpUaGlzIG5vdGVib29rIHByb3ZpZGVzIGFuIG92ZXJ2aWV3IG9mIHNvbWUgb2YgdGhlIGZlYXR1cmVzIGFuZCB0b29scyB0aGF0IGFyZSBhdCB0aGUgY29yZSBvZiB0aGUgYHRpZHlzdGxgIGZyYW1ld29yay4gTW9yZSBhYm91dCBgdGlkeXN0bGAgY2FuIGJlIGZvdW5kIG9uIHRoZSBbU0xVIG9wZW5HSVMgd2Vic2l0ZV0oaHR0cHM6Ly9zbHUtb3Blbmdpcy5naXRodWIuaW8vbmV3cy90aWR5c3RsX2Fubm91Y2VtZW50LykuCgojIyBEZXBlbmRlbmNpZXMKVGhpcyBub3RlYm9vayByZXF1aXJlcyBhIHZhcmlldHkgb2YgYHRpZHlzdGxgLCBgdGlkeXZlcnNlYCwgYW5kIG90aGVyIGRlcGVuZGVuY2llcy4gVGhlc2UgcmVmbGVjdCB0aGUgd2F5cyBpbiB3aGljaCBJIG1hbmFnZSBteSBvd24gcmVzZWFyY2ggYW5kIHRlYWNoIHN0dWRlbnRzIHRvIHVzZSBgUmAuIFRoZXJlIGFyZSBvdGhlciBmcmFtZXdvcmtzIGJvdGggZm9yIGRhdGEgd3JhbmdsaW5nIChpLmUuIGJhc2UgYFJgLCBgZHRgIChkYXRhdGFibGUpKSBhbmQgc3BhdGlhbCBkYXRhIG1hbmFnZW1lbnQgKGkuZS4gYHNwYCkuIFRoZSBjb2RlIGNodW5rcyBpbiB0aGUgW1JFQURNRS5tZCBmaWxlXShodHRwczovL2dpdGh1Yi5jb20vc2x1LW9wZW5HSVMvcmxhZGllczE5L2Jsb2IvbWFzdGVyL1JFQURNRS5tZCkgaW5jbHVkZSBpbnN0YWxsYXRpb24gY29kZSBmb3IgYWxsIGRlcGVuZGVuY2llcy4KCmBgYHtyIGxvYWQtcGFja2FnZXN9CiMgdGlkeXN0bCBwYWNrYWdlcwpsaWJyYXJ5KGNvbXBzdGF0cikgICAgICMgc3RsbXBkIGRhdGEgd3JhbmdsaW5nCmxpYnJhcnkoZ2F0ZXdheSkgICAgICAgIyBzdCBsb3VpcyBzcGF0aWFsIGRhdGEgdG9vbHMKbGlicmFyeShwb3N0bWFzdHIpICAgICAjIHN0cmVldCBhZGRyZXNzIG5vcm1hbGl6YXRpb24KbGlicmFyeShzdGxjc2IpICAgICAgICAjIHN0IGxvdWlzIGNpdGl6ZW5zIHNlcnZpY2UgYnVyZWF1IGRhdGEgd3JhbmdsaW5nCgojIHRpZHl2ZXJzZSBwYWNrYWdlcwpsaWJyYXJ5KGRwbHlyKSAgICAgICAgICMgZGF0YSB3cmFuZ2xpbmcKbGlicmFyeShnZ3Bsb3QyKSAgICAgICAjIHBsb3R0aW5nCgojIHNwYXRpYWwgcGFja2FnZXMKbGlicmFyeShzZikgICAgICAgICAgICAjIHNwYXRpYWwgZGF0YSB0b29scwoKIyBvdGhlciBwYWNrYWdlcwpsaWJyYXJ5KGhlcmUpICAgICAgICAgICMgZmlsZSBwYXRoIG1hbmFnZW1lbnQKYGBgCgojIyBMb2FkIERhdGEKVGhpcyBub3RlYm9vayByZXF1aXJlcyBhIG51bWJlciBvZiBkYXRhIHNldHMsIHNvbWUgb2Ygd2hpY2ggd2UgY2FuIGxvYWQgcmlnaHQgYXdheS4gVHdvIGxvY2FsIGdlb2NvZGVycyBhcmUgc2F2ZWQgYXMgYC5yZGFgIGZpbGVzIGluIHRoZSBgZGF0YS9gIHRvIHByb3ZpZGUgdGhlIG1vc3QgZWZmaWNpZW50IHN0b3JhZ2UgbWVhbnMgcG9zc2libGU6CgpgYGB7ciBsb2FkLWdlb2NvZGVyc30KIyBsb2FkIGxvY2FsIGZ1bGwgZ2VvY29kZXIKbG9hZChoZXJlKCJkYXRhIiwgImdlb2NvZGVyLnJkYSIpKQoKIyBsb2FkIGxvY2FsIHNob3J0IGdlb2NvZGVyCmxvYWQoaGVyZSgiZGF0YSIsICJnZW9jb2Rlcl9zLnJkYSIpKQpgYGAKCkJvdGggZ2VvY29kZXJzIGNvdWxkIGFsc28gYmUgYnVpbHQgdXNpbmcgdGhlIGBnYXRld2F5YCBwYWNrYWdlOgoKYGBgcgojIGJ1aWxkIGxvY2FsIGZ1bGwgZ2VvY29kZXIKZ2VvY29kZXIgPC0gZ3dfYnVpbGRfZ2VvY29kZXIoc3R5bGUgPSAiZnVsbCIsIGNsYXNzID0gInRpYmJsZSIsIHJldHVybiA9ICJjb29yZHMiKQoKIyBidWlsZCBsb2NhbCBzaG9ydCBnb2Vjb2RlcgpnZW9jb2Rlcl9zIDwtIGd3X2J1aWxkX2dlb2NvZGVyKHN0eWxlID0gInNob3J0IiwgY2xhc3MgPSAidGliYmxlIiwgcmV0dXJuID0gImNvb3JkcyIpCmBgYAoKVGhlc2UgYXJlIG5vdCBidWlsdCBoZXJlIHRvIHNhdmUgdGltZSBkdXJpbmcgdGhlIHR1dG9yaWFsLgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUkxhZGllcyAyMDE5IgphdXRob3I6ICJDaHJpc3RvcGhlciBQcmVuZXIsIFBoLkQuIgpkYXRlOiAnKGByIGZvcm1hdChTeXMudGltZSgpLCAiJUIgJWQsICVZIilgKScKb3V0cHV0OiAKICBnaXRodWJfZG9jdW1lbnQ6IGRlZmF1bHQKICBodG1sX25vdGVib29rOiBkZWZhdWx0IAotLS0KCiMjIEludHJvZHVjdGlvbgpUaGlzIG5vdGVib29rIHByb3ZpZGVzIGFuIG92ZXJ2aWV3IG9mIHNvbWUgb2YgdGhlIGZlYXR1cmVzIGFuZCB0b29scyB0aGF0IGFyZSBhdCB0aGUgY29yZSBvZiB0aGUgYHRpZHlzdGxgIGZyYW1ld29yay4gTW9yZSBhYm91dCBgdGlkeXN0bGAgY2FuIGJlIGZvdW5kIG9uIHRoZSBbU0xVIG9wZW5HSVMgd2Vic2l0ZV0oaHR0cHM6Ly9zbHUtb3Blbmdpcy5naXRodWIuaW8vbmV3cy90aWR5c3RsX2Fubm91Y2VtZW50LykuCgojIyBEZXBlbmRlbmNpZXMKVGhpcyBub3RlYm9vayByZXF1aXJlcyBhIHZhcmlldHkgb2YgYHRpZHlzdGxgLCBgdGlkeXZlcnNlYCwgYW5kIG90aGVyIGRlcGVuZGVuY2llcy4gVGhlc2UgcmVmbGVjdCB0aGUgd2F5cyBpbiB3aGljaCBJIG1hbmFnZSBteSBvd24gcmVzZWFyY2ggYW5kIHRlYWNoIHN0dWRlbnRzIHRvIHVzZSBgUmAuIFRoZXJlIGFyZSBvdGhlciBmcmFtZXdvcmtzIGJvdGggZm9yIGRhdGEgd3JhbmdsaW5nIChpLmUuIGJhc2UgYFJgLCBgZHRgIChkYXRhdGFibGUpKSBhbmQgc3BhdGlhbCBkYXRhIG1hbmFnZW1lbnQgKGkuZS4gYHNwYCkuIFRoZSBjb2RlIGNodW5rcyBpbiB0aGUgW1JFQURNRS5tZCBmaWxlXShodHRwczovL2dpdGh1Yi5jb20vc2x1LW9wZW5HSVMvcmxhZGllczE5L2Jsb2IvbWFzdGVyL1JFQURNRS5tZCkgaW5jbHVkZSBpbnN0YWxsYXRpb24gY29kZSBmb3IgYWxsIGRlcGVuZGVuY2llcy4KCmBgYHtyIGxvYWQtcGFja2FnZXN9CiMgdGlkeXN0bCBwYWNrYWdlcwpsaWJyYXJ5KGNvbXBzdGF0cikgICAgICMgc3RsbXBkIGRhdGEgd3JhbmdsaW5nCmxpYnJhcnkoZ2F0ZXdheSkgICAgICAgIyBzdCBsb3VpcyBzcGF0aWFsIGRhdGEgdG9vbHMKbGlicmFyeShwb3N0bWFzdHIpICAgICAjIHN0cmVldCBhZGRyZXNzIG5vcm1hbGl6YXRpb24KbGlicmFyeShzdGxjc2IpICAgICAgICAjIHN0IGxvdWlzIGNpdGl6ZW5zIHNlcnZpY2UgYnVyZWF1IGRhdGEgd3JhbmdsaW5nCgojIHRpZHl2ZXJzZSBwYWNrYWdlcwpsaWJyYXJ5KGRwbHlyKSAgICAgICAgICMgZGF0YSB3cmFuZ2xpbmcKbGlicmFyeShnZ3Bsb3QyKSAgICAgICAjIHBsb3R0aW5nCmxpYnJhcnkocmVhZHIpCgojIHNwYXRpYWwgcGFja2FnZXMKbGlicmFyeShzZikgICAgICAgICAgICAjIHNwYXRpYWwgZGF0YSB0b29scwoKIyBvdGhlciBwYWNrYWdlcwpsaWJyYXJ5KGhlcmUpICAgICAgICAgICMgZmlsZSBwYXRoIG1hbmFnZW1lbnQKbGlicmFyeSh0ZXN0dGhhdCkgICAgICAjIHVuaXQgdGVzdGluZwpgYGAKCiMjIExvYWQgRGF0YQpUaGlzIG5vdGVib29rIHJlcXVpcmVzIGEgbnVtYmVyIG9mIGRhdGEgc2V0cywgd2hpY2ggd2UnbGwgbG9hZCBpbiBncm91cHMgYmFzZWQgb24gdGhlaXIgcHVycG9zZS4KCiMjIyBHZW9jb2RlcnMKVHdvIGxvY2FsIGdlb2NvZGVycyBhcmUgc2F2ZWQgYXMgYC5yZGFgIGZpbGVzIGluIHRoZSBgZGF0YS9gIHRvIHByb3ZpZGUgdGhlIG1vc3QgZWZmaWNpZW50IHN0b3JhZ2UgbWVhbnMgcG9zc2libGU6CgpgYGB7ciBsb2FkLWdlb2NvZGVyc30KIyBsb2FkIGxvY2FsIGZ1bGwgZ2VvY29kZXIKbG9hZChoZXJlKCJkYXRhIiwgImdlb2NvZGVyLnJkYSIpKQoKIyBsb2FkIGxvY2FsIHNob3J0IGdlb2NvZGVyCmxvYWQoaGVyZSgiZGF0YSIsICJnZW9jb2Rlcl9zLnJkYSIpKQpgYGAKCkJvdGggZ2VvY29kZXJzIGNvdWxkIGFsc28gYmUgYnVpbHQgdXNpbmcgdGhlIGBnYXRld2F5YCBwYWNrYWdlOgoKYGBgcgojIGJ1aWxkIGxvY2FsIGZ1bGwgZ2VvY29kZXIKZ2VvY29kZXIgPC0gZ3dfYnVpbGRfZ2VvY29kZXIoc3R5bGUgPSAiZnVsbCIsIGNsYXNzID0gInRpYmJsZSIsIHJldHVybiA9ICJjb29yZHMiKQoKIyBidWlsZCBsb2NhbCBzaG9ydCBnb2Vjb2RlcgpnZW9jb2Rlcl9zIDwtIGd3X2J1aWxkX2dlb2NvZGVyKHN0eWxlID0gInNob3J0IiwgY2xhc3MgPSAidGliYmxlIiwgcmV0dXJuID0gImNvb3JkcyIpCmBgYAoKVGhlc2UgYXJlIG5vdCBidWlsdCBoZXJlIHRvIHNhdmUgdGltZSBkdXJpbmcgdGhlIHR1dG9yaWFsLgoKIyMjIENpdGl6ZW5zJyBTZXJ2aWNlIEJ1cmVhdSBEYXRhCkEgZGF0YSBzZXQgb2Ygbm9uLWVtZXJnZW5jeSBzZXJ2aWNlIHJlcXVlc3RzICh0aGluZ3MgbGlrZSBjb25jZXJucyBhYm91dCBwb3Rob2xlcywgdHJhZmZpYyBsaWdodHMgdGhhdCBhcmUgb3V0LCBhbmQgdmFjYW50IGJ1aWxkaW5ncykgZm9yIHRoZSB5ZWFycyAyMDE3IGFuZCAyMDE4IGlzIGluY2x1ZGVkIGluIHRoaXMgcmVwb3NpdG9yeToKCmBgYHtyIGxvYWQtY3NifQpjc2IgPC0gcmVhZF9jc3YoaGVyZSgiZGF0YSIsICJjc2IuY3N2IikpCmBgYAoKVGhlc2UgZGF0YSBjYW4gYWxzbyBiZSBkb3dubG9hZGVkIGRpcmVjdGx5IHZpYSB0aGUgYHN0bGNzYmAgcGFja2FnZSdzIGBjc2JfZ2V0X2RhdGEoKWAgZnVuY3Rpb246CgpgYGByCmNzYiA8LSBjc2JfZ2V0X2RhdGEoeWVhcnMgPSAyMDE3OjIwMTgpCmBgYAoKVGhlIGB5ZWFyc2AgYXJndW1lbnQgaXMgb3B0aW9uYWwuCgojIyMgQ3JpbWUgRGF0YQpUaGUgY3JpbWUgZGF0YSB3ZSdsbCBiZSBsb29raW5nIGF0IHRvZGF5LCBhbHNvIGZvciAyMDE3IGFuZCAyMDE4LCBpcyBpbmNsdWRlZCBpbiBpdHMgcmF3IGZvcm0gaW4gYGRhdGEvY3JpbWUvYC4gVGhlc2UgZGF0YSBoYXZlIGJlZW4gZG93bmxvYWRlZCBmcm9tIHRoZSBTdC4gTG91aXMgTWV0cm9wb2xpdGFuIFBvbGljZSBEZXBhcnRtZW50J3MgW2NyaW1lIHN0YXRpc3RpY3Mgd2Vic2l0ZV0oaHR0cHM6Ly93d3cuc2xtcGQub3JnL0NyaW1lcmVwb3J0cy5zaHRtbCkuIEJlY2F1c2Ugb2YgdGhlIHN0cnVjdHVyZSBvZiB0aGUgc2l0ZSwgd2UgZG9uJ3QgaGF2ZSBhIGZ1bmN0aW9uIGF0IHRoaXMgdGltZSB0aGUgcmVhZHMgdGhlIGZpbGVzIGludG8gYFJgIGRpcmVjdGlvbiBmcm9tIHRoZSB3ZWIuIFRoZXkgbXVzdCBiZSBkb3dubG9hZGVkIG1hbnVhbGx5IGFuZCB0aGVuIGNhbiBiZSByZWFkIGluIHVzaW5nIHRoZSB3b3JrZmxvdyBiZWxvdy4KClRoZSBgY29tcHN0YXRyYCBwYWNrYWdlIGlzICJvcGluaW9uYXRlZCIgYW5kIHJlcXVpcmVzIGEgcGFydGljdWxhciBvcmdhbml6YXRpb25hbCBhcHByb2FjaCAtIG1vbnRobHkgY3JpbWUgZmlsZXMgc2hvdWxkIGJlIHN0b3JlZCBhcyBhIHBhY2thZ2UgaW4gZGVkaWNhdGVkIHllYXJseSBmb2xkZXJzLiBOb3RpY2UgdGhhdCB0aGUgZmlsZXMgaGF2ZSB0aGUgYC5odG1sYCBmaWxlIGV4dGVuc2lvbiBtaXN0YWtlbmx5IGFwcGVuZGVkOgoKYGBge3IgbGlzdC0yMDE3fQpsaXN0LmZpbGVzKHBhdGggPSBoZXJlKCJkYXRhIiwgImNyaW1lIiwgIjIwMTciKSkKYGBgCgpXZSBjYW4gZml4IHRoaXMgd2l0aCBgY3NfcHJlcF95ZWFyKClgLiBUaGUgYHZlcmJvc2VgIG9wdGlvbiByZXR1cm5zIGEgdGliYmxlIHRoYXQgaWxsdXN0cmF0ZXMgaG93IGZpbGUgbmFtZXMgaGF2ZSBiZWVuIG1vZGlmaWVkLiBPbmNlIG1vZGlmaWVkLCB0aGV5IGNhbiBiZSBsb2FkZWQgd2l0aCBgY3NfbG9hZF95ZWFyKClgOgoKYGBge3IgcHJlcC1sb2FkLTIwMTd9CiMgcHJlcCBmaWxlcwpjc19wcmVwX3llYXIocGF0aCA9IGhlcmUoImRhdGEiLCAiY3JpbWUiLCAiMjAxNyIpLCB2ZXJib3NlID0gVFJVRSkKCiMgbG9hZCBkYXRhCmRhdGEyMDE3X3JhdyA8LSBjc19sb2FkX3llYXIoaGVyZSgiZGF0YSIsICJjcmltZSIsICIyMDE3IikpCmBgYAoKVGhlIGBkYXRhMjAxN19yYXdgIGlzIGEgbGlzdCBvZiB0aWJibGVzLCB3aXRoIG9uZSB0aWJibGUgcGVyIG1vbnRoIGZvciBlYWNoIG1vbnRoIGluIGEgZ2l2ZW4gZm9sZGVyLiBUaGlzIGFsbG93cyBmb3IgYSBzdHJlYW1saW5lZCB3b3JrZmxvdyBmb3IgdmFsaWRhdGluZyBhbmQgc3RhbmRhcmRpemluZyB0aGUgZGF0YS4KCk5vdyB5b3UgdHJ5IGFuZCBmaXggdGhlIGZpbGVzIGluIHRoZSBgZGF0YS9jcmltZS8yMDE4YCBmb2xkZXIgYW5kIHRoZW4gbG9hZCB0aGVtOgoKYGBge3IgcHJlcC1sb2FkLTIwMTh9CiMgcHJlcCBmaWxlcwpjc19wcmVwX3llYXIocGF0aCA9IGhlcmUoImRhdGEiLCAiY3JpbWUiLCAiMjAxOCIpLCB2ZXJib3NlID0gVFJVRSkKCiMgbG9hZCBkYXRhCmRhdGEyMDE4X3JhdyA8LSBjc19sb2FkX3llYXIoaGVyZSgiZGF0YSIsICJjcmltZSIsICIyMDE4IikpCmBgYAoKIyMgVmFsaWRhdGUsIFN0YW5kYXJkaXplLCBhbmQgQ29sbGFwc2UgQ3JpbWUgRGF0YQpUaGUgZGF0YSBmcm9tIFNMTVBEIGhhdmUgdW4tZXZlbiBudW1iZXJzIG9mIGNvbHVtbnMsIGNvbHVtbiBuYW1lcywgYW5kIGNvbHVtbiB0eXBlcyBkZXBlbmRpbmcgb24gdGhlIHllYXIgCgojIyMgMjAxOApXZSB2YWxpZGF0ZSB0aGUgZGF0YSB0byBtYWtlIHN1cmUgaXQgY2FuIGJlIGNvbGxhcHNlZCB1c2luZyBgY3NfdmFsaWRhdGUoKWA6CgpgYGB7ciB2YWxpZGF0ZS1kYXRhMTh9CmNzX3ZhbGlkYXRlKGRhdGEyMDE4X3JhdywgeWVhciA9ICIyMDE4IikKYGBgCgpTaW5jZSB0aGUgdmFsaWRhdGlvbiByZXN1bHQgaXMgYSB2YWx1ZSBvZiBgVFJVRWAsIHdlIGNhbiBwcm9jZWVkIHRvIGNvbGxhcHNpbmcgdGhlIHllYXItbGlzdCBvYmplY3QgaW50byBhIHNpbmdsZSB0aWJibGUgd2l0aCBgY3NfY29sbGFwc2UoKWAgYW5kIHRoZW4gc3RyaXBwaW5nIG91dCBjcmltZXMgcmVwb3J0ZWQgaW4gMjAxOCBmb3IgZWFybGllciB5ZWFycyB1c2luZyBgY3NfY29tYmluZSgpYC4gV2UgYWxzbyBzdHJpcCBvdXQgdW5mb3VuZGVkIGNyaW1lcyB0aGF0IHJlbWFpbiB1c2luZyBgY3NfZmlsdGVyX2NvdW50KClgOgoKYGBge3IgY29sbGFwc2UtZGF0YTE4fQojIGNvbGxhcHNlIGludG8gc2luZ2xlIG9iamVjdApkYXRhMjAxOF9yYXcgPC0gY3NfY29sbGFwc2UoZGF0YTIwMThfcmF3KQoKIyBjb21iaW5lIGFuZCBmaWx0ZXIKY3NfY29tYmluZSh0eXBlID0gInllYXIiLCBkYXRlID0gMjAxOCwgZGF0YTIwMThfcmF3KSAlPiUKICBjc19maWx0ZXJfY291bnQodmFyID0gQ291bnQpIC0+IGRhdGEyMDE4CmBgYAoKVGhlIGBkYXRhMjAxOGAgb2JqZWN0IG5vdyBjb250YWlucyBvbmx5IGNyaW1lcyByZXBvcnRlZCBpbiAyMDE4Lgo=</div>
 
 
 

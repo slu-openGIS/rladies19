@@ -23,16 +23,21 @@ library(stlcsb)        # st louis citizens service bureau data wrangling
 # tidyverse packages
 library(dplyr)         # data wrangling
 library(ggplot2)       # plotting
+library(readr)
 
 # spatial packages
 library(sf)            # spatial data tools
 
 # other packages
 library(here)          # file path management
+library(testthat)      # unit testing
 ```
 
 ## Load Data
-This notebook requires a number of data sets, some of which we can load right away. Two local geocoders are saved as `.rda` files in the `data/` to provide the most efficient storage means possible:
+This notebook requires a number of data sets, which we'll load in groups based on their purpose.
+
+### Geocoders
+Two local geocoders are saved as `.rda` files in the `data/` to provide the most efficient storage means possible:
 
 ```{r load-geocoders}
 # load local full geocoder
@@ -53,3 +58,72 @@ geocoder_s <- gw_build_geocoder(style = "short", class = "tibble", return = "coo
 ```
 
 These are not built here to save time during the tutorial.
+
+### Citizens' Service Bureau Data
+A data set of non-emergency service requests (things like concerns about potholes, traffic lights that are out, and vacant buildings) for the years 2017 and 2018 is included in this repository:
+
+```{r load-csb}
+csb <- read_csv(here("data", "csb.csv"))
+```
+
+These data can also be downloaded directly via the `stlcsb` package's `csb_get_data()` function:
+
+```r
+csb <- csb_get_data(years = 2017:2018)
+```
+
+The `years` argument is optional.
+
+### Crime Data
+The crime data we'll be looking at today, also for 2017 and 2018, is included in its raw form in `data/crime/`. These data have been downloaded from the St. Louis Metropolitan Police Department's [crime statistics website](https://www.slmpd.org/Crimereports.shtml). Because of the structure of the site, we don't have a function at this time the reads the files into `R` direction from the web. They must be downloaded manually and then can be read in using the workflow below.
+
+The `compstatr` package is "opinionated" and requires a particular organizational approach - monthly crime files should be stored as a package in dedicated yearly folders. Notice that the files have the `.html` file extension mistakenly appended:
+
+```{r list-2017}
+list.files(path = here("data", "crime", "2017"))
+```
+
+We can fix this with `cs_prep_year()`. The `verbose` option returns a tibble that illustrates how file names have been modified. Once modified, they can be loaded with `cs_load_year()`:
+
+```{r prep-load-2017}
+# prep files
+cs_prep_year(path = here("data", "crime", "2017"), verbose = TRUE)
+
+# load data
+data2017_raw <- cs_load_year(here("data", "crime", "2017"))
+```
+
+The `data2017_raw` is a list of tibbles, with one tibble per month for each month in a given folder. This allows for a streamlined workflow for validating and standardizing the data.
+
+Now you try and fix the files in the `data/crime/2018` folder and then load them:
+
+```{r prep-load-2018}
+# prep files
+cs_prep_year(path = here("data", "crime", "2018"), verbose = TRUE)
+
+# load data
+data2018_raw <- cs_load_year(here("data", "crime", "2018"))
+```
+
+## Validate, Standardize, and Collapse Crime Data
+The data from SLMPD have un-even numbers of columns, column names, and column types depending on the year 
+
+### 2018
+We validate the data to make sure it can be collapsed using `cs_validate()`:
+
+```{r validate-data18}
+cs_validate(data2018_raw, year = "2018")
+```
+
+Since the validation result is a value of `TRUE`, we can proceed to collapsing the year-list object into a single tibble with `cs_collapse()` and then stripping out crimes reported in 2018 for earlier years using `cs_combine()`. We also strip out unfounded crimes that remain using `cs_filter_count()`:
+
+```{r collapse-data18}
+# collapse into single object
+data2018_raw <- cs_collapse(data2018_raw)
+
+# combine and filter
+cs_combine(type = "year", date = 2018, data2018_raw) %>%
+  cs_filter_count(var = Count) -> data2018
+```
+
+The `data2018` object now contains only crimes reported in 2018.
