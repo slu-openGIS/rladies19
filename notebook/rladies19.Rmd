@@ -42,7 +42,6 @@ There is also a function that is not yet part of the `compstatr` package that we
 source(here("source", "combine_address.R"))
 ```
 
-
 ## Load Data
 This notebook requires a number of data sets, which we'll load in groups based on their purpose.
 
@@ -105,10 +104,10 @@ We can fix this with `cs_prep_year()`. The `verbose` option returns a tibble tha
 
 ```{r prep-load-2017}
 # prep files
-cs_prep_year(path = here("data", "crime", "2017"), verbose = TRUE)
+
 
 # load data
-data2017_raw <- cs_load_year(here("data", "crime", "2017"))
+
 ```
 
 The `data2017_raw` is a list of tibbles, with one tibble per month for each month in a given folder. This allows for a streamlined workflow for validating and standardizing the data.
@@ -117,10 +116,10 @@ Now you try and fix the files in the `data/crime/2018` folder and then load them
 
 ```{r prep-load-2018}
 # prep files
-cs_prep_year(path = here("data", "crime", "2018"), verbose = TRUE)
+
 
 # load data
-data2018_raw <- cs_load_year(here("data", "crime", "2018"))
+
 ```
 
 ## Validate, Standardize, and Collapse Crime Data
@@ -130,18 +129,17 @@ The data from SLMPD have un-even numbers of columns, column names, and column ty
 We validate the data to make sure it can be collapsed using `cs_validate()`:
 
 ```{r validate-data18}
-cs_validate(data2018_raw, year = "2018")
+
 ```
 
 Since the validation result is a value of `TRUE`, we can proceed to collapsing the year-list object into a single tibble with `cs_collapse()` and then stripping out crimes reported in 2018 for earlier years using `cs_combine()`. We also strip out unfounded crimes that remain using `cs_filter_count()`:
 
 ```{r collapse-data18}
 # collapse into single object
-data2018_raw <- cs_collapse(data2018_raw)
+
 
 # combine and filter
-cs_combine(type = "year", date = 2018, data2018_raw) %>%
-  cs_filter_count(var = Count) -> data2018
+
 ```
 
 The `data2018` object now contains only crimes reported in 2018.
@@ -150,51 +148,49 @@ The `data2018` object now contains only crimes reported in 2018.
 We'll repeat the validation process with the 2017 data:
 
 ```{r validate-data17}
-cs_validate(data2017_raw, year = "2017")
+
 ```
 
-Since we fail the validation, we can use the `verbose = TRUE` option to get a summary of where validation issues are occuring. 
+Since we fail the validation, we can use the `verbose = TRUE` option to get a summary of where validation issues are occurring. 
 
 ```{r validate-data17-verbose}
-cs_validate(data2017_raw, year = "2017", verbose = TRUE)
+
 ```
 
 The data for May 2017 do not pass the validation checks. We can extract this month and confirm that there are too many columns in the May 2017 release. Once we have that confirmed, we can standardize that month and re-run our validation.
 
 ```{r fix-may17}
 # extract data and unit test column numbers
-expect_equal(ncol(cs_extract_month(data2017_raw, month = "May")), 26)
+
 
 # standardize months
-data2017_raw <- cs_standardize(data2017_raw, month = "May", config = 26)
+
 
 # validate data
-cs_validate(data2017_raw, year = "2017")
+
 ```
 
 We now get a `TRUE` value for `cs_validate()` and can move on to collapsing the 2017 and 2018 raw data objects to create a new object, `data2017`, that contains all known 2017 crimes including those that were reported or upgraded in 2018.
 
 ```{r collapse-data17}
 # collapse into single object
-data2017_raw <- cs_collapse(data2017_raw)
+
 
 # combine and filter
-cs_combine(type = "year", date = 2017, data2018_raw, data2017_raw) %>%
-  cs_filter_count(var = Count) -> data2017
+
 ```
 
 ### Create Single Crime Table
 Next, we'll create a single table before we remove individual years. We also subset columns to reduce the footprint of the table.
 
 ```{r collapse-all}
-bind_rows(data2017, data2018) %>%
-  select(cs_year, DateOccur, Crime, Description, ILEADSAddress, ILEADSStreet) -> crimes
+
 ```
 
-With our `crimes` object created, we can also clean-up our global enviornment:
+With our `crimes` object created, we can also clean-up our global environment:
 
 ```{r clean-up}
-rm(data2017_raw, data2017, data2018_raw, data2018)
+
 ```
 
 ## Wrangling CSB Data
@@ -213,10 +209,10 @@ csb %>%
 We also want to remove csb calls that were cancelled. We can use the `csb_canceled()` function to do this:
 
 ```{r remove-canceled-csb}
-csb <- csb_canceled(csb, var = datecancelled) 
+
 ```
 
-Finally, we'll pull out just the calls related to degredation to explore them further. The `stlcsb` package comes with objects that are fed into the `category` argument to make subsetting easier. For example, here are the call descriptions associated with degredation:
+Finally, we'll pull out just the calls related to degradation to explore them further. The `stlcsb` package comes with objects that are fed into the `category` argument to make subletting easier. For example, here are the call descriptions associated with degradation:
 
 ```{r degrade-descrips}
 cat_degrade
@@ -225,23 +221,20 @@ cat_degrade
 To subset only those calls, we'll use `csb_filter()`:
 
 ```{r create-degrade}
-csb_degrade <- csb_filter(csb, var = problemcode, category = cat_degrade)
+
 ```
 
 ## Wrangling Crime Data
 Additionally, we want to combine the `ILEADSAddress` and `ILEADSStreet` variables into a single address string. We'll use a function that is included in our project's `source/` subdirectory, `combine_address()`, to do this. *This functionality will be built into the next release of `compstatr`.*
 
 ```{r}
-crimes %>%
-  combine_address() %>%
-  select(-ILEADSStreet, -ILEADSAddress) %>%
-  select(cs_year, address, everything()) -> crimes
+
 ```
 
-With our address data combined into a single column, we'll subset the violent crime data (homicides, rapes, aggrevated assualts, and robberies) for further exploration:
+With our address data combined into a single column, we'll subset the violent crime data (homicides, rapes, aggravated assaults, and robberies) for further exploration:
 
 ```{r}
-crime_violent <- cs_filter_crime(crimes, var = Crime, crime = "violent")
+
 ```
 
 ## Geocode Data
@@ -252,68 +245,56 @@ First, we'll check out the types of addresses that the `postmastr` package finds
 
 ```{r identify-violent-addresses}
 # identify
-crime_violent <- pm_identify(crime_violent, var = address)
+
 
 # evaluate
-pm_evaluate(crime_violent)
+
 ```
 
 For simplicity's sake tonight, we're going to drop the `unknown`, `partial`, and `full` address types from the data set:
 
 ```{r subset-violent-addresses}
-crime_violent <- filter(crime_violent, pm.type == "short" | pm.type == "intersection")
+
 ```
 
 Now, we'll do the same for the Citizens' Service Bureau Data. We want to identify the address types (using the `probaddress` variable), evaluate them, and the subset out any non `"short"` or `"intersection"` addresses:
 
 ```{r identify-degrade-addresses}
 # identify
-csb_degrade <- pm_identify(csb_degrade, var = probaddress)
+
 
 # evaluate
-pm_evaluate(csb_degrade)
+
 
 # subset
-csb_degrade <- filter(csb_degrade, pm.type == "short" | pm.type == "intersection")
+
 ```
 
-With our addresses identified and subset, we can now normalize them using the `postmastr` package's `pm_parse()` function. Normalizing parsed address is the process of taking unstandardized addresses and returning their standardized versions:
+With our addresses identified and subset, we can now normalize them using the `postmastr` package's `pm_parse()` function. Normalizing parsed address is the process of taking un-standardized addresses and returning their standardized versions:
 
 ```{r}
-crime_violent <- pm_parse(crime_violent, input = "short", address = address, 
-                            output = "short", new_address = addressClean, 
-                            houseSuf_dict = stl_std_houseSuffix,
-                            dir_dict = stl_std_directions,
-                            street_dict = stl_std_streets,
-                            suffix_dict = stl_std_suffix)
+
 ```
 
 We can use the same `pm_parse()` syntax to normalize the `csb_degrade` data using the `probaddress` variable:
 
 ```{r}
-csb_degrade <- pm_parse(csb_degrade, input = "short", address = probaddress, 
-                            output = "short", new_address = addressClean,
-                            houseSuf_dict = stl_std_houseSuffix,
-                            dir_dict = stl_std_directions,
-                            street_dict = stl_std_streets,
-                            suffix_dict = stl_std_suffix)
+
 ```
 
 ### Geocode
 With our data normalized, we can move on geocoding them using our composite geocoder. A composite geocoder tries to match addresses using one source, and if that does not work tries a second source (and so on for as many possible sources are included in the geocoder).
 
-There are two varients of the composite geocoder in the `gateway` package. The first is a "local" geocoder than returns only results that are matched in the two local geocoder objects, `geocoder` and `geocoder_s` in this case:
+There are two variants of the composite geocoder in the `gateway` package. The first is a "local" geocoder than returns only results that are matched in the two local geocoder objects, `geocoder` and `geocoder_s` in this case:
 
 ```{r}
-crime_violent <- gw_geocode_composite(crime_violent, var = addressClean,
-                                        local_geocoder = geocoder, short_geocoder = geocoder_s,
-                                        local = TRUE, osm = FALSE)
+
 ```
 
 Alternatively, we can use a geocoder that calls the City of St. Louis's address candidate API. The API returns results like this:
 
 ```{r}
-gw_add_candidates(street = "3700 Lindell Blvd")
+
 ```
 
 The composite geocoder uses a minimum threshold of 90% by default, but this can be changed. The following syntax would geocode the violent crime data:
@@ -343,48 +324,36 @@ load(here("data", "csb_degrade.rda"))
 We need to convert our geocoded data to an `sf` object. This is a two part process. We need to first remove data missing coordinates, and then project it using `sf`'s `st_as_sf()` function: 
 
 ```{r project-crime}
-crime_violent %>%
-  filter(is.na(source) == FALSE) %>%
-  st_as_sf(coords = c("x", "y"), crs = 4269) -> crime_violent
+
 ```
 
 We'll do the same with the CSB data:
 
 ```{r project-csb}
-csb_degrade %>%
-  filter(is.na(source) == FALSE) %>%
-  st_as_sf(coords = c("x", "y"), crs = 4269) -> csb_degrade
+
 ```
 
 ## Aggregating
-One thing we often want to know is how many crimes or incidents occur in a particular neighborhood. We can aggregate our individual incidents up to the neighborhood they occured in to get counts using the `gateway` package's `gw_aggregate()` function:
+One thing we often want to know is how many crimes or incidents occur in a particular neighborhood. We can aggregate our individual incidents up to the neighborhood they occurred in to get counts using the `gateway` package's `gw_aggregate()` function:
 
 ```{r aggregate-violent}
-csb_violent_nhood <- gw_aggregate(crime_violent, to = "neighborhood") %>%
-  rename(violent = COUNT)
+
 ```
 
 We can do the same for CSB incidents:
 
 ```{r aggregate-degrade}
-csb_degrade_nhood <- gw_aggregate(csb_degrade, to = "neighborhood") %>%
-  rename(degrade = COUNT)
 
 # create copy
-csb_degrade_nhood_sf <- csb_degrade_nhood
 
 # remove geometry
-st_geometry(csb_degrade_nhood) <- NULL
 ```
 
 ## Plotting
-One way to explore the relationship between our two data sets is a scatterplot, which we can make with `ggplot2`:
+One way to explore the relationship between our two data sets is a scatter plot, which we can make with `ggplot2`:
 
 ```{r compare-crime-degrade}
-left_join(csb_violent_nhood, csb_degrade_nhood, by = "ID") %>%
-  ggplot(mapping = aes(violent, degrade)) +
-  geom_point() +
-  geom_smooth()
+
 ```
 
 
@@ -392,22 +361,18 @@ left_join(csb_violent_nhood, csb_degrade_nhood, by = "ID") %>%
 With our data projected, we can move on to mapping. I like the `mapview` package for previewing data. For example, we can look at our point data:
 
 ```{r preview-point}
-mapview(csb_degrade)
+
 ```
 
 Or we can preview our polygon data:
 
 ```{r preview-nhood}
-mapview(csb_degrade_nhood_sf)
+
 ```
 
 We can also map these using `ggplot2`. For example:
 
 ```{r map-violent}
-ggplot() + 
-  geom_sf(data = csb_violent_nhood, mapping = aes(fill = violent), color = NA) + 
-  geom_sf(data = highway, color = "#000000", size = 1.5, fill = NA) +
-  geom_sf(data = city, fill = NA, color = "#000000", size = .25) + 
-  scale_fill_viridis(option = "viridis")
+
 ```
 

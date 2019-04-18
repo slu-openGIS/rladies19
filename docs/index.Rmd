@@ -150,10 +150,16 @@ class: inverse, center, middle
 
 ---
 
+# Address Normalization
+
+```{r, echo=FALSE, fig.align="center", out.width = "100%"}
+knitr::include_graphics(path = "assets/normalize.png")
+```
+
+---
+
 # Open Source, Composite Geocoding
 
 ```{r, echo=FALSE, fig.align="center", out.width = "100%"}
 knitr::include_graphics(path = "assets/compositeGeocoder.png")
 ```
-
-
