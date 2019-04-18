@@ -24,6 +24,7 @@ library(stlcsb)        # st louis citizens service bureau data wrangling
 library(dplyr)         # data wrangling
 library(ggplot2)       # plotting
 library(readr)
+library(stringr)
 
 # spatial packages
 library(sf)            # spatial data tools
@@ -32,6 +33,13 @@ library(sf)            # spatial data tools
 library(here)          # file path management
 library(testthat)      # unit testing
 ```
+
+There is also a function that is not yet part of the `compstatr` package that we'll use today:
+
+```{r load-combine-address}
+source(here("source", "combine_address.R"))
+```
+
 
 ## Load Data
 This notebook requires a number of data sets, which we'll load in groups based on their purpose.
@@ -73,6 +81,19 @@ csb <- csb_get_data(years = 2017:2018)
 ```
 
 The `years` argument is optional.
+
+With the data loaded, we'll subset the number of columns to reduce the amount of data we need to wade through and make an edit to the address field:
+
+```{r}
+csb %>% 
+  select(datetimeinit, probaddress, problemcode, status) %>%
+  mutate(probaddress = str_replace(string = probaddress, pattern = " - ", replacement = "-")) %>%
+  mutate(probaddress = str_replace(string = probaddress, pattern = "- ", replacement = "-")) %>%
+  mutate(probaddress = str_replace(string = probaddress, pattern = " -", replacement = "-")) %>%
+  mutate(probaddress = str_replace(string = probaddress, pattern = "MO-", replacement = "MO ")) %>%
+  mutate(probaddress = str_replace(string = probaddress, pattern = "I-", replacement = "I ")) -> csb
+```
+
 
 ### Crime Data
 The crime data we'll be looking at today, also for 2017 and 2018, is included in its raw form in `data/crime/`. These data have been downloaded from the St. Louis Metropolitan Police Department's [crime statistics website](https://www.slmpd.org/Crimereports.shtml). Because of the structure of the site, we don't have a function at this time the reads the files into `R` direction from the web. They must be downloaded manually and then can be read in using the workflow below.
@@ -127,3 +148,171 @@ cs_combine(type = "year", date = 2018, data2018_raw) %>%
 ```
 
 The `data2018` object now contains only crimes reported in 2018.
+
+### 2017
+We'll repeat the validation process with the 2017 data:
+
+```{r validate-data17}
+cs_validate(data2017_raw, year = "2017")
+```
+
+Since we fail the validation, we can use the `verbose = TRUE` option to get a summary of where validation issues are occuring. 
+
+```{r validate-data17-verbose}
+cs_validate(data2017_raw, year = "2017", verbose = TRUE)
+```
+
+The data for May 2017 do not pass the validation checks. We can extract this month and confirm that there are too many columns in the May 2017 release. Once we have that confirmed, we can standardize that month and re-run our validation.
+
+```{r fix-may17}
+# extract data and unit test column numbers
+expect_equal(ncol(cs_extract_month(data2017_raw, month = "May")), 26)
+
+# standardize months
+data2017_raw <- cs_standardize(data2017_raw, month = "May", config = 26)
+
+# validate data
+cs_validate(data2017_raw, year = "2017")
+```
+
+We now get a `TRUE` value for `cs_validate()` and can move on to collapsing the 2017 and 2018 raw data objects to create a new object, `data2017`, that contains all known 2017 crimes including those that were reported or upgraded in 2018.
+
+```{r collapse-data17}
+# collapse into single object
+data2017_raw <- cs_collapse(data2017_raw)
+
+# combine and filter
+cs_combine(type = "year", date = 2017, data2018_raw, data2017_raw) %>%
+  cs_filter_count(var = Count) -> data2017
+```
+
+### Create Single Crime Table
+Next, we'll create a single table before we remove individual years. We also subset columns to reduce the footprint of the table.
+
+```{r collapse-all}
+bind_rows(data2017, data2018) %>%
+  select(cs_year, DateOccur, Crime, Description, ILEADSAddress, ILEADSStreet) -> crimes
+```
+
+With our `crimes` object created, we can also clean-up our global enviornment:
+
+```{r clean-up}
+rm(data2017_raw, data2017, data2018_raw, data2018)
+```
+
+### Create Single Address Field
+Additionally, we want to combine the `ILEADSAddress` and `ILEADSStreet` variables into a single address string:
+
+```{r}
+crimes %>%
+  combine_address() %>%
+  select(-ILEADSStreet, -ILEADSAddress) %>%
+  select(cs_year, address, everything()) -> crimes
+```
+
+*This functionality will be built into the next release of `compstatr`.*
+
+## Geocode Data
+Once we have our data subset and prepared, we can begin the geocoding process. The first step is to normalize the street address data. 
+
+### Normalize Addresses
+First, we'll check out the types of addresses that the `postmastr` package finds on its initial pass with `pm_identify()`:
+
+```{r identify-crime-addresses}
+# identify
+crimes_pm <- pm_identify(crimes, var = address)
+
+# evaluate
+pm_evaluate(crimes_pm)
+```
+
+For simplicity's sake tonight, we're going to drop the `unknown`, `partial`, and `full` address types from the data set:
+
+```{r}
+crimes_pm <- filter(crimes_pm, pm.type == "short" | pm.type == "intersection")
+```
+
+Now, you do the same for the Citizens' Service Bureau Data. Identify the address types (using the `probaddress` variable), evaluate them, and the subset out any non `"short"` or `"intersection"` addresses:
+
+```{r identify-csb-addresses}
+# identify
+csb_pm <- pm_identify(csb, var = probaddress)
+
+# evaluate
+pm_evaluate(csb_pm)
+
+# subset
+csb_pm <- filter(csb_pm, pm.type == "short" | pm.type == "intersection")
+```
+
+We need to remove two problem addresses from the CSB data as well:
+
+```{r}
+csb_pm <- filter(csb_pm, pm.uid %in% c(25337, 34985, 51193, 52708, 53787, 56486, 58849, 90282, 90353, 102210, 103177) == FALSE)
+```
+
+
+With our addresses identified and subset, we can now normalize them using `pm_parse()`:
+
+```{r}
+crimes_pm <- pm_parse(crimes_pm, input = "short", address = address, 
+                            output = "short", new_address = addressClean, 
+                            houseSuf_dict = stl_std_houseSuffix,
+                            dir_dict = stl_std_directions,
+                            street_dict = stl_std_streets,
+                            suffix_dict = stl_std_suffix)
+```
+
+Now you try - use the same `pm_parse()` syntax to normalize the `csb_pm` data using the `probaddress` variable:
+
+```{r}
+csb_pm <- pm_parse(csb_pm, input = "short", address = probaddress, 
+                            output = "short", new_address = addressClean,
+                            houseSuf_dict = stl_std_houseSuffix,
+                            dir_dict = stl_std_directions,
+                            street_dict = stl_std_streets,
+                            suffix_dict = stl_std_suffix)
+```
+
+```{r}
+csb_pm %>%
+  pm_prep(var = "probaddress", type = "street") %>%
+  pm_house_parse() %>%
+  pm_houseRange_detect() -> x
+```
+
+```{r}
+x %>%
+  filter(pm.hasHouseRange == TRUE) %>%
+  dplyr::mutate(pm.houseVal = ifelse(pm.hasHouseRange == TRUE, pm.house, NA)) %>%
+  dplyr::mutate(pm.houseVal = stringr::str_replace(pm.houseVal, pattern = "-", replacement = " ")) %>%
+  dplyr::mutate(pm.houseLow = stringr::word(pm.houseVal, 1)) %>%
+  dplyr::mutate(pm.houseHigh = stringr::word(pm.houseVal, 2)) %>%
+  dplyr::mutate(pm.houseShort = ifelse(stringr::str_length(pm.houseLow) > stringr::str_length(pm.houseHigh), TRUE, FALSE)) %>%
+  dplyr::mutate(pm.houseHigh = ifelse(pm.houseShort == TRUE,
+                                      stringr::str_c(stringr::str_sub(pm.houseLow,
+                                                                      start = 1,
+                                                                      end = stringr::str_length(pm.houseLow)-
+                                                                        stringr::str_length(pm.houseHigh)),
+                                                     pm.houseHigh),
+                                      pm.houseHigh)) %>%
+  dplyr::mutate(pm.house2 = ifelse(pm.houseShort == TRUE, stringr::str_c(pm.houseLow, "-", pm.houseHigh), pm.house)) %>%
+  dplyr::mutate(pm.house = ifelse(is.na(pm.house2) == FALSE, pm.house2, pm.house)) %>%
+  dplyr::select(-pm.house2, -pm.houseShort, -pm.houseVal) -> y
+```
+
+```{r}
+filter(y, suppressWarnings(as.numeric(pm.houseLow)) > suppressWarnings(as.numeric(pm.houseHigh))) -> z
+```
+
+```{r}
+# address reversed ranges
+    z %>%
+      dplyr::mutate(pm.houseLow2 = ifelse(as.numeric(pm.houseLow) > as.numeric(pm.houseHigh), pm.houseHigh, NA)) %>%
+      dplyr::mutate(pm.houseHigh2 = ifelse(as.numeric(pm.houseLow) > as.numeric(pm.houseHigh), pm.houseLow, NA)) %>%
+      dplyr::mutate(pm.houseLow = ifelse(is.na(pm.houseLow2) == FALSE, pm.houseLow2, pm.houseLow)) %>%
+      dplyr::mutate(pm.houseHigh = ifelse(is.na(pm.houseHigh2) == FALSE, pm.houseHigh2, pm.houseHigh)) %>%
+      dplyr::select(-pm.houseLow2, -pm.houseHigh2)
+```
+
+
