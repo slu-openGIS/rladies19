@@ -17,6 +17,7 @@ Imports:
     gapminder,
     gateway,
     ggplot2,
+    here,
     knitr,
     postmastr,
     rmarkdown,
