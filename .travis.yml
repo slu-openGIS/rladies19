@@ -28,6 +28,7 @@ before_install:
     - ./.travis/install.sh
 
 script:
+  - Rscript -e "rmarkdown::render('docs/index.Rmd')"
   - Rscript -e "rmarkdown::render('notebook/rladies19-complete.Rmd')"
 
 after_success:

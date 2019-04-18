@@ -21,8 +21,8 @@ before_test:
   - pandoc -v
 
 environment:
-  global:
-    WARNINGS_ARE_ERRORS: 1
+  # global:
+  #  WARNINGS_ARE_ERRORS: 1
 
   matrix:
     - R_VERSION: devel
@@ -52,6 +52,7 @@ build_script:
   - travis-tool.sh install_deps
 
 test_script:
+  - Rscript -e "rmarkdown::render('docs/index.Rmd')"
   - Rscript -e "rmarkdown::render('notebook/rladies19-complete.Rmd')"
 
 on_failure:

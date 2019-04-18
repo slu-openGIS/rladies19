@@ -16,6 +16,7 @@ Imports:
     dplyr,
     gapminder,
     gateway,
+    ggplot2,
     knitr,
     postmastr,
     rmarkdown,
