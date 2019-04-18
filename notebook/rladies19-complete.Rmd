@@ -8,10 +8,10 @@ output:
 ---
 
 ## Introduction
-This notebook provides an overview of some of the features and tools that are at the core of the `tidystl` framework. More about `tidystl` can be found on the [SLU openGIS website](https://slu-opengis.github.io/news/tidystl_annoucement/). 
+This notebook provides an overview of some of the features and tools that are at the core of the `tidystl` framework. More about `tidystl` can be found on the [SLU openGIS website](https://slu-opengis.github.io/news/tidystl_annoucement/).
 
 ## Dependencies
-This notebook requires a variety of `tidystl`, `tidyverse`, and other dependencies. These reflect the ways in which I manage my own research and teach students to use `R`. There are other frameworks both for data wrangling (i.e. base `R`, `dt` (datatable)) and spatial data management (i.e. `sp`).
+This notebook requires a variety of `tidystl`, `tidyverse`, and other dependencies. These reflect the ways in which I manage my own research and teach students to use `R`. There are other frameworks both for data wrangling (i.e. base `R`, `dt` (datatable)) and spatial data management (i.e. `sp`). The code chunks in the [README.md file](https://github.com/slu-openGIS/rladies19/blob/master/README.md) include installation code for all dependencies.
 
 ```{r load-packages}
 # tidystl packages
