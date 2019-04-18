@@ -2,7 +2,7 @@
 title: "tidystl"
 subtitle: "Mapping St. Louis health and social data with R"
 author: "Chris Prener"
-date: "April 17th, 2019"
+date: "April 18th, 2019"
 output:
   xaringan::moon_reader:
     lib_dir: libs
