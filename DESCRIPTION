@@ -24,7 +24,8 @@ Imports:
     rmarkdown,
     stlcsb,
     testthat,
-    usethis
+    usethis,
+    xaringan
 Remotes:
     slu-openGIS/compstatr,
     slu-openGIS/gateway,
