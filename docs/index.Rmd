@@ -144,6 +144,11 @@ knitr::include_graphics(path = "assets/tidystl_05.png")
 ```
 
 ---
+class: inverse, center, middle
+
+# Illustrations
+
+---
 
 # Open Source, Composite Geocoding
 
